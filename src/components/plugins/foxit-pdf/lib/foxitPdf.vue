@@ -6,6 +6,7 @@
   import './sdk/UIExtension.css';
   import './sdk/selUIExtension.css'
   require('./sdk/UIExtension.full.js');
+  const preloadJrWorker = require('./sdk/preload-jr-worker.js');
   export default {
     name: 'foxit-pdf',
     props: {
@@ -49,6 +50,13 @@
     methods: {
       // 初始化pdfui
       initPdfUi(){
+        const readyWorker = preloadJrWorker({
+           workerPath: '/foxitPdf/',
+           enginePath: '/foxitPdf/jr-engine/gsdk',
+           fontPath: '/external/brotli',
+           licenseSN: this.licenseSN,
+           licenseKey: this.licenseKey
+        })   
         this.pdfui = new UIExtension.PDFUI({
           il8n: { 
             absolutePath: '/locals',        
@@ -57,8 +65,7 @@
           viewerOptions: {
             libPath: '/foxitPdf',
             jr: {
-              licenseSN: this.licenseSN,
-              licenseKey: this.licenseKey,
+              readyWorker: readyWorker
             }
           },
           renderTo: '#pdf-ui',
